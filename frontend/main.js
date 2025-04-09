@@ -37,7 +37,7 @@ function send(name, stime, ftime) {
     }
     if (searchparams == 1) {
         event.id = url.get("id")
-        fetch(`http://localhost:5001/event/${url.get("id")}`, {"method": "PUT",
+        fetch(`https://calendar-server-lyl0unhdh.vercel.app/api/${url.get("id")}`, {"method": "PUT",
             "headers": {
                 "Content-Type": "application/json"
             },
@@ -46,7 +46,7 @@ function send(name, stime, ftime) {
         .then(data => console.log(data))
         .then(changeLoc)
     } else {
-        fetch("http://localhost:5001/event", {"method": "POST",
+        fetch("https://calendar-server-lyl0unhdh.vercel.app/api/event", {"method": "POST",
             "headers": {
                 "Content-Type": "application/json"
             },
