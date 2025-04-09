@@ -2,7 +2,7 @@ let atrr = "ftime";
 let data = null;
 let ul = document.getElementById("ul");
 
-fetch("https://calendar-server-ecru.vercel.app/api/events")
+fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
   .then(response => response.text())
   .then(text => {
     let parsedData = JSON.parse(text);
@@ -74,7 +74,7 @@ fetch("https://calendar-server-ecru.vercel.app/api/events")
   }
   
   function deleteItem(id) {
-    fetch("https://calendar-server-ecru.vercel.app/api/events", {"method": "DELETE",
+    fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events", {"method": "DELETE",
       "headers": {
         "Content-Type": "application/json"
       },
@@ -103,7 +103,7 @@ fetch("https://calendar-server-ecru.vercel.app/api/events")
   }
   
   function update(id) {
-    fetch(`https://calendar-server-ecru.vercel.app/api/events/${id}`)
+    fetch(`https://calendar-server-lyl0unhdh.vercel.app/api/events/${id}`)
     .then(response => response.json())
     .then(text => {
       console.log(text);
