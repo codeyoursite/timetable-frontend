@@ -1,8 +1,11 @@
-let atrr = "ftime";
+let atrr = "end_time";
 let data = null;
 let ul = document.getElementById("ul");
 
-fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
+const WEB_URL = "/frontend"
+const API_URL = "https://calendar-server-ecru.vercel.app/api"
+
+fetch(`${API_URL}/event`)
   .then(response => response.text())
   .then(text => {
     let parsedData = JSON.parse(text);
@@ -12,12 +15,15 @@ fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
     if (Array.isArray(parsedData) && parsedData.length > 0) {
       parsedData = sortArray(parsedData, atrr)
       data = parsedData;
+      console.log( ul)
       
       let arr = [];
       if (ul) {
+        console.log(data)
         for (let i = 0; i < parsedData.length; i++) {
-          if (new Date(parsedData[i].stime).getMonth() == new Date().getMonth()){
+          if (new Date(parsedData[i].start_time).getMonth() == new Date().getMonth()){
             let event = parsedData[i];
+            console.log(event)
             createItem(event)
             arr.push(event);
           }
@@ -49,8 +55,8 @@ fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
   function buildItem(li, event){
     li.innerHTML = `
     <strong>Event:</strong> ${event.name}<br>
-    <strong>Start Time:</strong> ${new Date(event.stime).toLocaleString()}<br>
-    <strong>End Time:</strong> ${new Date(event.ftime).toLocaleString()}
+    <strong>Start Time:</strong> ${new Date(event.start_time).toLocaleString()}<br>
+    <strong>End Time:</strong> ${new Date(event.end_time).toLocaleString()}
     `;
     let btn = document.createElement("button");
     btn.setAttribute("id", "btn" + event.id);
@@ -74,7 +80,7 @@ fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
   }
   
   function deleteItem(id) {
-    fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events", {"method": "DELETE",
+    fetch(`${API_URL}/event`, {"method": "DELETE",
       "headers": {
         "Content-Type": "application/json"
       },
@@ -103,11 +109,14 @@ fetch("https://calendar-server-lyl0unhdh.vercel.app/api/events")
   }
   
   function update(id) {
-    fetch(`https://calendar-server-lyl0unhdh.vercel.app/api/events/${id}`)
+    fetch(`${API_URL}/event/${id}`)
     .then(response => response.json())
     .then(text => {
       console.log(text);
-      let url = `http://127.0.0.1:5500?event=${text.name}&eventStart=${text.stime}&eventEnd=${text.ftime}&id=${text.id}`
+
+
+      let url = `${WEB_URL}/?event=${text.name}&eventStart=${text.start_time}&eventEnd=${text.end_time}&id=${text.id}`
+
       window.location.replace(url);
     }
   )
@@ -140,11 +149,11 @@ function updateDisplay(sorted) {
 // sort.addEventListener("click", () => {
   //   if (sort.textContent == "Sort: Finish Time") {
     //     sort.textContent = "Sort: Start Time";
-    //     atrr = "stime";
+    //     atrr = "start_time";
     //   } else {
       //     sort.textContent = "Sort: Finish Time";
       
-//     atrr = "ftime";
+//     atrr = "end_time";
 //   }
 //   let sorted = sortArray(data, atrr)
 //   updateDisplay(sorted)
@@ -172,7 +181,7 @@ for (let i = 0; i < 7; i++) {
 // Adding to cal (div)
 function addToWeek(parsedData) {
   for (let item of parsedData) {
-    let date = item.stime;
+    let date = item.start_time;
     let new_date = new Date(date)
     let d = new_date.getDate()
     createCal(d,item.id, item.name)
@@ -184,7 +193,6 @@ function createCal(day, id,name, isEvent=true) {
   let div = document.createElement("div");
   div.innerHTML = name
   div.setAttribute("id", id)
-  console.log(day,id,isEvent)
   // Event Logic
   if (isEvent){
     let day_div = document.getElementById(day);
@@ -206,9 +214,9 @@ function createCal(day, id,name, isEvent=true) {
       let title = document.getElementById("title");
       title.textContent = name;
       let estart = document.getElementById("estart");
-      estart.textContent = new Date(currentData.stime).toLocaleString();
+      estart.textContent = new Date(currentData.start_time).toLocaleString();
       let eend = document.getElementById("eend");
-      eend.textContent = new Date(currentData.ftime).toLocaleString();
+      eend.textContent = new Date(currentData.end_time).toLocaleString();
       
       let upd = document.getElementById("update");
       let del = document.getElementById("delete");
@@ -228,7 +236,6 @@ function createCal(day, id,name, isEvent=true) {
         console.log("clicked")
         deleteItem(id);
       });
-      console.log(data);
     }); 
 
     // Old event listener
@@ -263,10 +270,8 @@ function createCalendar(month,year){
   current_date = 0
 
   while (current_date < dates.length){
-    console.log(current_date)
     for(let day = 0; day < days.length; day++){
       let d = new Date(dates[current_date])
-      console.log(d.getDay())
       if (d.getDay() == day){
         createCal(d.getDay(),d.getDate(), d.getDate(),false)
         current_date +=1
@@ -322,7 +327,6 @@ createCalendar(new Date().getMonth() + 1, new Date().getFullYear())
 // Highlighting current day
 function highlight() {
   let dayObj = new Date().getDate()
-  console.log(dayObj);
   document.getElementById(dayObj).classList.add("today")
 }
 

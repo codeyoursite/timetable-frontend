@@ -2,12 +2,17 @@ let form = document.getElementById("form")
 // Url search params
 let url = new URL(document.location.toString()).searchParams
 let searchparams = null;
+
 if (url.size == 4) {
     searchparams = 1;
     document.getElementById("name").value = url.get("event")
     document.getElementById("stime").value = formatDateTime(url.get("eventStart"))
     document.getElementById("ftime").value = formatDateTime(url.get("eventEnd"))
 }
+
+const WEB_URL = "/frontend"
+
+const API_URL = "https://calendar-server-ecru.vercel.app/api"
 
 // Set Default Time to now on stime
 // let current_date = new Date()
@@ -27,7 +32,7 @@ form.addEventListener("submit", (e) => {
 });
 
 function changeLoc() {
-    window.location.href = `/events.html`;
+    window.location.href = `${WEB_URL}/events.html`;
 }
 
 function send(name, stime, ftime) {
@@ -37,7 +42,7 @@ function send(name, stime, ftime) {
     }
     if (searchparams == 1) {
         event.id = url.get("id")
-        fetch(`https://calendar-server-lyl0unhdh.vercel.app/api/${url.get("id")}`, {"method": "PUT",
+        fetch(`${API_URL}${url.get("id")}`, {"method": "PUT",
             "headers": {
                 "Content-Type": "application/json"
             },
@@ -46,14 +51,14 @@ function send(name, stime, ftime) {
         .then(data => console.log(data))
         .then(changeLoc)
     } else {
-        fetch("https://calendar-server-lyl0unhdh.vercel.app/api/event", {"method": "POST",
+        fetch(`${API_URL}/event`, {"method": "POST",
             "headers": {
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify(event)
-        }).then(data => data.json)
+        }).then(data => data.json())
         .then(data => console.log(data))
-        .then(changeLoc)
+    
     }
 }
 
