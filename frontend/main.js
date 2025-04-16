@@ -58,7 +58,7 @@ function send(name, stime, ftime) {
             "body": JSON.stringify(event)
         }).then(data => data.json())
         .then(data => console.log(data))
-        .catch(e => console.error(e))
+        .catch(e => console.error(e, e.message))
     }
 }
 
