@@ -3,7 +3,7 @@ let data = null;
 let ul = document.getElementById("ul");
 
 const WEB_URL = "/frontend"
-const API_URL = "https://calendar-server-ecru.vercel.app/api"
+const API_URL = "http://localhost:5001/api"
 
 fetch(`${API_URL}/event`)
   .then(response => response.text())

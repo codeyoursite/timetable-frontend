@@ -11,9 +11,11 @@ if (url.size == 4) {
 }
 
 const WEB_URL = "/frontend"
+const dev_mode = true;
+// ternary operator
+const API_URL = "http://localhost:5001/api" // dev_mode ? "http://localhost:8080/api/" : "https://api.example.com/api/"
 
-const API_URL = "https://calendar-server-ecru.vercel.app/api"
-
+console.log("URL", API_URL)
 // Set Default Time to now on stime
 // let current_date = new Date()
 // document.getElementById("stime").value = current_date.toDateString();
@@ -40,24 +42,28 @@ function send(name, stime, ftime) {
         "stime": stime,
         "ftime": ftime
     }
+    console.log(event)
     if (searchparams == 1) {
         event.id = url.get("id")
-        fetch(`${API_URL}${url.get("id")}`, {"method": "PUT",
-            "headers": {
+        fetch(`${API_URL}/event/${url.get("id")}`, {"method": "PUT",
+            headers: {
                 "Content-Type": "application/json"
             },
-            "body": JSON.stringify(event)
-        }).then(data => data.json)
-        .then(data => console.log(data))
-        .then(changeLoc)
-    } else {
-        fetch(`${API_URL}/event`, {"method": "POST",
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": JSON.stringify(event)
+            body: JSON.stringify(event)
         }).then(data => data.json())
         .then(data => console.log(data))
+        //.then(changeLoc)
+    } else {
+        console.log(`${API_URL}/event/`)
+        fetch(`${API_URL}/event/`, {method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(event)
+        }).then(data => data.json())
+        .then(data => console.log(data))
+
+        // .then(changeLoc)
     
     }
 }
