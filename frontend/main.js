@@ -13,7 +13,7 @@ if (url.size == 4) {
 const WEB_URL = "/frontend"
 const dev_mode = true;
 // ternary operator
-const API_URL = "http://localhost:5001/api" // dev_mode ? "http://localhost:8080/api/" : "https://api.example.com/api/"
+const API_URL = "https://calendar-server-ecru.vercel.app/api" // dev_mode ? "http://localhost:8080/api/" : "https://api.example.com/api/"
 
 console.log("URL", API_URL)
 // Set Default Time to now on stime
@@ -52,7 +52,7 @@ function send(name, stime, ftime) {
             body: JSON.stringify(event)
         }).then(data => data.json())
         .then(data => console.log(data))
-        //.then(changeLoc)
+        .then(changeLoc)
     } else {
         console.log(`${API_URL}/event/`)
         fetch(`${API_URL}/event/`, {method: "POST",
@@ -63,7 +63,7 @@ function send(name, stime, ftime) {
         }).then(data => data.json())
         .then(data => console.log(data))
 
-        // .then(changeLoc)
+        .then(changeLoc)
     
     }
 }

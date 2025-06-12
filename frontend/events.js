@@ -1,9 +1,11 @@
 let atrr = "end_time";
 let data = null;
 let ul = document.getElementById("ul");
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
 const WEB_URL = "/frontend"
-const API_URL = "http://localhost:5001/api"
+const API_URL = "https://calendar-server-ecru.vercel.app/api"
 
 fetch(`${API_URL}/event`)
   .then(response => response.text())
@@ -24,7 +26,6 @@ fetch(`${API_URL}/event`)
           if (new Date(parsedData[i].start_time).getMonth() == new Date().getMonth()){
             let event = parsedData[i];
             console.log(event)
-            createItem(event)
             arr.push(event);
           }
         }
@@ -37,27 +38,33 @@ fetch(`${API_URL}/event`)
 
   let module = document.getElementById("module")
   module.style.display = "none";
-  let close = document.getElementById("close")
-  close.addEventListener("click", () => {
-      console.log("Click event")
-      module.style.display = "none";
-  });
-
+  
   
   function createItem(event) {
-    let li = document.createElement("li");
-    li.setAttribute("id", "Item"+event.id);
-    li = buildItem(li, event)
-    li.style.display="None"
-    ul.appendChild(li);
+    let lis = buildItem(event)
+    for (li of lis){
+      ul.appendChild(li);
+    }
+    
   }
   
-  function buildItem(li, event){
-    li.innerHTML = `
-    <strong>Event:</strong> ${event.name}<br>
-    <strong>Start Time:</strong> ${new Date(event.start_time).toLocaleString()}<br>
-    <strong>End Time:</strong> ${new Date(event.end_time).toLocaleString()}
+  function buildItem(event){
+    let lis = []
+    for (let i = 0; i < 4; i++) {
+      let li = document.createElement("li");
+
+      
+      li.setAttribute("class", "Item "+event.id);
+ 
+      lis.push(li)
+    }
+    lis[0].innerHTML = `<strong>Event:</strong> ${event.name}`
+    lis[1].innerHTML = `<strong>Start Time:</strong> ${new Date(event.start_time).toLocaleString()}`
+    lis[2].innerHTML = `<strong>End Time:</strong> ${new Date(event.end_time).toLocaleString()}
     `;
+
+    let div = document.createElement("div")
+
     let btn = document.createElement("button");
     btn.setAttribute("id", "btn" + event.id);
     btn.innerHTML = `Delete`;
@@ -66,17 +73,19 @@ fetch(`${API_URL}/event`)
     btn.addEventListener("click", (e) => {
       deleteItem(event.id);
     })
-    li.appendChild(btn);
+    div.appendChild(btn);
+
     let btn2 = document.createElement("button");
     btn2.setAttribute("id", "btn2" + event.id);
     btn2.innerHTML = `Update`;
     btn2.classList.add("btn")
     btn2.classList.add("btn-secondary")
-    li.appendChild(btn2);
+    div.appendChild(btn2);
     btn2.addEventListener("click", (e) => {
       update(event.id);
     })
-    return li
+    lis[3].appendChild(div)
+    return lis
   }
   
   function deleteItem(id) {
@@ -168,15 +177,7 @@ function recreateNode(el){
 
 
 let days = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-let cal = document.getElementsByClassName("calendar")[0]
-for (let i = 0; i < 7; i++) {
-  let div = document.createElement("div")
-  div.setAttribute("class", "day")
-  div.setAttribute("id", days[i]
-  )
-  div.innerText = days[i].substring(0, 3);
-  cal.appendChild(div);
-}
+
 
 // Adding to cal (div)
 function addToWeek(parsedData) {
@@ -199,58 +200,24 @@ function createCal(day, id,name, isEvent=true) {
     div.setAttribute("class", "event")
 
 
-    // New Event Listener
-    div.addEventListener("click", () => {
-      let currentData = data;
-      for (let item of data){
-        if (item.id == id) {
-          currentData = item;
-          break;
-        }
-      }
-
-      module.style.display = "block";
     
-      let title = document.getElementById("title");
-      title.textContent = name;
-      let estart = document.getElementById("estart");
-      estart.textContent = new Date(currentData.start_time).toLocaleString();
-      let eend = document.getElementById("eend");
-      eend.textContent = new Date(currentData.end_time).toLocaleString();
-      
-      let upd = document.getElementById("update");
-      let del = document.getElementById("delete");
-
-      recreateNode(upd);
-      recreateNode(del);
-      
-      upd = document.getElementById("update");
-      del = document.getElementById("delete");
-      
-      console.log("Event Listener now")
-      upd.addEventListener("click", (e) => {
-        console.log("Update Clicked")
-        update(id);
-      });
-      del.addEventListener("click", (e) => {
-        console.log("clicked")
-        deleteItem(id);
-      });
-    }); 
-
     // Old event listener
 
     div.addEventListener("click", () => {
-      console.info(id)
-      let itemid = document.getElementById("Item" + id);
-      if (itemid.style.display === "block") {
-        itemid.style.display = "none";
-      } else {
-        const children = document.getElementById("ul").children;
-        for (let child of children) {
-          child.style.display = "none";
+      // Get the event
+      const event = data.filter((item) =>{
+        return item.id === id;
+      })[0]
+      const ul = document.getElementsByTagName("ul")[0]
+      ul.innerHTML = ""
+      if (ul.getAttribute('id') !== id){
+        for (el of buildItem(event)){
+          ul.appendChild(el)
         }
-        itemid.style.display = "block";
+        ul.setAttribute("id", id)
+      }
+      else{
+        ul.setAttribute("id", "")
       }
     });
     
@@ -266,6 +233,18 @@ function createCal(day, id,name, isEvent=true) {
 }
 
 function createCalendar(month,year){
+
+  let cal = document.getElementById("calendar")
+  console.log(month)
+
+  for (let i = 0; i < 7; i++) {
+    let div = document.createElement("div")
+    div.setAttribute("class", "day")
+    div.setAttribute("id", days[i]
+    )
+    div.innerText = days[i].substring(0, 3);
+    cal.appendChild(div);
+  }
   let dates = stringify(month,year)
   current_date = 0
 
@@ -283,8 +262,6 @@ function createCalendar(month,year){
   }
   
 }
-
-// Make a function that creates strings in the form dd/mm/yy for all dates in December
 
 let months = [4, 6, 9, 11]
 
@@ -330,5 +307,22 @@ function highlight() {
   document.getElementById(dayObj).classList.add("today")
 }
 
+function heading() {
+  let date = new Date()
+  document.getElementById("month").textContent = date.toLocaleString("default", {month:"long"})
+}
+
+heading();
 highlight();
+
+const left_button = document.getElementById("left")
+left_button.addEventListener("click", ()=>{
+  console.log("Click")
+  const calendar = document.getElementById("calendar");
+  calendar.innerHTML="";
+  currentMonth = (currentMonth + 11) % 12
+  console.log(currentMonth);
+  createCalendar(currentMonth, currentYear)
+
+})
 
